@@ -1,7 +1,8 @@
 package com.nc.edu.phonenet;
 
+import com.nc.edu.phonenet.model.Subscriber;
+
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

@@ -1,4 +1,4 @@
-package com.nc.edu.phonenet;
+package com.nc.edu.phonenet.model;
 
 /**
  * Created by Ксения on 2/4/2016.

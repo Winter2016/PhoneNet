@@ -1,5 +1,7 @@
 package com.nc.edu.phonenet;
 
+import com.nc.edu.phonenet.model.Subscriber;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -19,27 +21,19 @@ public class SubscrReader {
         public List<Subscriber> readSubscr()
         {
             List<Subscriber> ss = new ArrayList<Subscriber>();
-            BufferedReader reader = null;
             String line;
-            try {
-                reader = new BufferedReader(new FileReader(fileName));
+            try (FileReader fileReader = new FileReader(fileName);
+                 BufferedReader reader = new BufferedReader(fileReader)) {
+
                 while ((line = reader.readLine()) != null) {
                     String chunks[] = line.split(" ");
                     ss.add(new Subscriber(chunks[1].toString() + ' ' + chunks[2].toString() +' ' + chunks[3].toString(), chunks[0].toString(), Double.valueOf(chunks[4])));
                 }
-            }
-            catch (FileNotFoundException e) {
+
+            } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
-            } finally
-            {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
             }
             return ss;
         }
