@@ -1,5 +1,6 @@
 package com.nc.edu.phonenet;
 import com.nc.edu.phonenet.model.Subscriber;
+import com.nc.edu.phonenet.read_write.SubscrReaderWriter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -69,7 +70,7 @@ public class SubscrUI extends JFrame {
                         String str = text1.getText();
                         if (str.isEmpty())
                             listModel.addElement("Пожалуйста, введите запрос");
-                        SubscrReader sr = new SubscrReader("SubscriberList.txt");
+                        SubscrReaderWriter sr = new SubscrReaderWriter("SubscriberList.txt");
                         java.util.List<Subscriber> ss =  sr.readSubscr();
                         for (Subscriber subscr : ss) {
                             String subname = subscr.getName();
@@ -109,12 +110,8 @@ public class SubscrUI extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         String str = text1.getText();
-                        SubscrWriter sw = new SubscrWriter("SubscriberList.txt");
-                        try {
+                        SubscrReaderWriter sw = new SubscrReaderWriter("SubscriberList.txt");
                             sw.writeSubscr(str);
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
                     }
                 });
 
@@ -146,7 +143,7 @@ public class SubscrUI extends JFrame {
                     public void actionPerformed(ActionEvent e) {
                         String str = text1.getText();
                         String chunks[] = str.split(" ");
-                        SubscrReader sr = new SubscrReader("SubscriberList.txt");
+                        SubscrReaderWriter sr = new SubscrReaderWriter("SubscriberList.txt");
                         List<Subscriber> ss =  sr.readSubscr();
                         for (int i = 0; i < ss.size(); i++) {
                             String subnumber = ss.get(i).getPhnumber();
@@ -154,12 +151,8 @@ public class SubscrUI extends JFrame {
                                 ss.get(i).replenish(Double.valueOf(chunks[1]));
                             }
                         }
-                        SubscrReWriter srw = new SubscrReWriter("SubscriberList.txt");
-                        try {
+                        SubscrReaderWriter srw = new SubscrReaderWriter("SubscriberList.txt");
                             srw.rewriteSubscr(ss);
-                        } catch (IOException e1) {
-                            e1.printStackTrace();
-                        }
                     }
                 });
             }
