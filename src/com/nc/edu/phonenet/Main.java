@@ -2,28 +2,47 @@ package com.nc.edu.phonenet;
 
 import com.nc.edu.phonenet.model.Subscriber;
 
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 
 /**
  * Created by Ксения on 2/4/2016.
  */
 public class Main {
-    public static void main(String [] args) throws IOException {
-        SubscrWriter sw = new SubscrWriter("SubscriberList.txt");
-        try {
-            sw.writeSubscr("9064563234 Иванов Иван Иванович 0.0");
-            sw.writeSubscr("9064562356 Петров Петр Петрович 50.0");
+    public static void main(String [] args) {
+        JSONParser parser = new JSONParser();
+        String fileName = "SubscriberList.txt";
+        String line = "9034593321 Romanov Roman Romanovich 10.0";
+        String chunks[] = line.split(" ");
+
+        try (FileReader reader = new FileReader(fileName)) {
+            Object object = parser.parse(reader);
+            JSONObject obj = (JSONObject) object;
+            JSONArray ar = (JSONArray) obj.get("s_list");
+            JSONObject ob = new JSONObject();
+            ob.put("s_number", chunks[0]);
+            ob.put("s_surname", chunks[1]);
+            ob.put("s_fname", chunks[2]);
+            ob.put("s_sname", chunks[3]);
+            ob.put("s_balance", chunks[4]);
+            ar.add(ob);
+            try (FileWriter writer = new FileWriter(fileName)){
+                writer.append(ob.toJSONString());
+                writer.close();
+            } catch (IOException ex) {
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        SubscrReader sr = new SubscrReader("SubscriberList.txt");
-        List<Subscriber> ss =  sr.readSubscr();
-
-        ss.get(0).replenish(10.0);
-        SubscrReWriter srw = new SubscrReWriter("SubscriberList.txt");
-        srw.rewriteSubscr(ss);
-      //  sw.writeSubscr(ss.get(0).replenish(10.0));
     }
 }
