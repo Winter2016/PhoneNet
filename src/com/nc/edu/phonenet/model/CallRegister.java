@@ -6,17 +6,11 @@ package com.nc.edu.phonenet.model;
 public class CallRegister {
     private Subscriber outCaller;
     private Subscriber inCaller;
-    private int duration;
-    private double price;
+    private double cost;
 
-    public CallRegister(Subscriber outCaller, Subscriber inCaller, int duration, double price) {
+    public CallRegister(Subscriber outCaller, Subscriber inCaller,double cost) {
         this.outCaller = outCaller;
         this.inCaller = inCaller;
-        this.duration = duration;
-        this.price = price;
-    }
-    public double costCalc(int duration, double price)
-    {
-        return duration*price;
+        this.cost = cost;
     }
 }

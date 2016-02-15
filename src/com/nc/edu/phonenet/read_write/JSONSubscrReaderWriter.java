@@ -51,28 +51,19 @@ public class JSONSubscrReaderWriter implements Readable, Writeable {
     }
 
     public void writeSubscr(String line) {
-        JSONParser parser = new JSONParser();
         String chunks[] = line.split(" ");
-        try (FileReader reader = new FileReader(fileName)) {
-            Object object = parser.parse(reader);
-            JSONObject obj = (JSONObject) object;
-            JSONArray ar = (JSONArray) obj.get("s_list");
-            JSONObject ob = new JSONObject();
-            ob.put("s_number", chunks[0]);
-            ob.put("s_surname", chunks[1]);
-            ob.put("s_fname", chunks[2]);
-            ob.put("s_sname", chunks[3]);
-            ob.put("s_balance", chunks[4]);
-            ar.add(ob);
-            try (FileWriter writer = new FileWriter(fileName)){
-                writer.append(ob.toJSONString());
-                writer.close();
-            } catch (IOException ex) {
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        JSONObject ob = new JSONObject();
+        ob.put("s_number", chunks[0]);
+        ob.put("s_surname", chunks[1]);
+        ob.put("s_fname", chunks[2]);
+        ob.put("s_sname", chunks[3]);
+        ob.put("s_balance", chunks[4]);
+        try (FileWriter writer = new FileWriter(fileName, true)){
+            writer.append(ob.toJSONString());
+            writer.append(',');
+            writer.append(System.getProperty("line.separator"));
+            writer.close();
+        } catch (IOException ex) {
         }
     }
 }

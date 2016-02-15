@@ -36,7 +36,7 @@ public class SubscrReaderWriter implements Readable,ReWriteable, Writeable{
     }
 
     public void writeSubscr(String line) {
-        try(FileWriter fileWriter = new FileWriter(fileName);
+        try(FileWriter fileWriter = new FileWriter(fileName, true);
             BufferedWriter writer = new BufferedWriter(fileWriter)) {
             writer.append(line);
             writer.append(System.getProperty("line.separator"));

@@ -15,7 +15,7 @@ public class Subscriber implements Replenishable {
     }
     public void replenish(double sum)
     {
-        balance += sum;
+        balance -= sum;
     }
 
     public String getName() {

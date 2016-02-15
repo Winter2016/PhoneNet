@@ -16,7 +16,7 @@ public class SubscrUI extends JFrame {
     public SubscrUI() {
         super("Абоненты");
         setTitle("Абоненты");
-        setSize(300, 100);
+        setSize(370, 100);
         setLocation(500, 200);
         setDefaultCloseOperation( EXIT_ON_CLOSE );
         setResizable(false);
@@ -26,9 +26,11 @@ public class SubscrUI extends JFrame {
         JButton but1 = new JButton("Найти");
         JButton but2 = new JButton("Добавить");
         JButton but3 = new JButton("Изменить");
+        JButton but4 = new JButton("Записать");
         grid.add(but1);
         grid.add(but2);
         grid.add(but3);
+        grid.add(but4);
 
         JPanel flow = new JPanel(new FlowLayout(
                 FlowLayout.CENTER ));
@@ -155,6 +157,73 @@ public class SubscrUI extends JFrame {
                             srw.rewriteSubscr(ss);
                     }
                 });
+            }
+        });
+        //слушатель кнопки Записать
+        but4.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final JFrame registerForm = new JFrame("Записать");
+                registerForm.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                registerForm.setSize(500,120);
+                registerForm.setLocation(500, 200);
+                registerForm.setVisible(true);
+                JPanel grid2 = new JPanel(new GridLayout(1, 2) );
+                JPanel grid3 = new JPanel(new GridLayout(1, 2) );
+                JPanel grid4 = new JPanel(new GridLayout(1, 1) );
+                SubscrReaderWriter rw = new SubscrReaderWriter("SubscriberList.txt");
+                List <Subscriber> sc = rw.readSubscr();
+                String items [] = new String[sc.size()];
+                for (int i = 0; i < sc.size(); i++)
+                    items[i] = sc.get(i).getPhnumber() + ' ' + sc.get(i).getName();
+                final JComboBox jcombOut = new JComboBox(items);
+                final JComboBox jcombIn = new JComboBox(items);
+                final JTextField text1 = new JTextField("", 10);
+                JButton but5 = new JButton("Записать");
+                JLabel jlab = new JLabel("Стоимость");
+                grid2.add(jcombOut);
+                grid2.add(jcombIn);
+                grid3.add(jlab);
+                grid3.add(text1);
+                grid4.add(but5);
+
+                JPanel border = new JPanel(new BorderLayout());
+                registerForm.add(border, BorderLayout.NORTH);
+                border.add(grid2,BorderLayout.CENTER);
+
+                JPanel border2 = new JPanel(new BorderLayout());
+                registerForm.add(border2, BorderLayout.CENTER);
+                border2.add(grid3,BorderLayout.CENTER);
+
+                JPanel border3 = new JPanel(new BorderLayout());
+                registerForm.add(border3, BorderLayout.SOUTH);
+                border3.add(grid4,BorderLayout.CENTER);
+
+                //слушатель кнопки Записать на второй форме
+                but5.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        Double cost = Double.valueOf(text1.getText());
+                        String strOut = (String)jcombOut.getSelectedItem();
+                        String strIn = (String)jcombIn.getSelectedItem();
+                        SubscrReaderWriter rw = new SubscrReaderWriter("SubscriberList.txt");
+                        List <Subscriber> sc = rw.readSubscr();
+                        SubscrReaderWriter srw = new SubscrReaderWriter("CallReg.txt");
+                        String outNumber = strOut.split(" ")[0];
+                        if (strOut.equals(strIn))
+                            System.out.println("Can't call to yourself");
+                        else {
+                            srw.writeSubscr(strOut + ' ' + strIn + ' ' + cost);
+                            for (int i = 0; i < sc.size(); i++)
+                            {
+                                if (sc.get(i).getPhnumber().equals(outNumber))
+                                    sc.get(i).replenish(cost);
+                            }
+                            rw.rewriteSubscr(sc);
+                        }
+                    }
+                });
+
             }
         });
     }
