@@ -21,7 +21,7 @@ public class SubscrUI extends JFrame {
         setDefaultCloseOperation( EXIT_ON_CLOSE );
         setResizable(false);
 
-        JPanel grid = new JPanel(new GridLayout(1, 3) );
+        final JPanel grid = new JPanel(new GridLayout(1, 3) );
         // добавление кнопок
         JButton but1 = new JButton("Найти");
         JButton but2 = new JButton("Добавить");
@@ -210,8 +210,19 @@ public class SubscrUI extends JFrame {
                         List <Subscriber> sc = rw.readSubscr();
                         SubscrReaderWriter srw = new SubscrReaderWriter("CallReg.txt");
                         String outNumber = strOut.split(" ")[0];
-                        if (strOut.equals(strIn))
-                            System.out.println("Can't call to yourself");
+                        if (strOut.equals(strIn)) {
+                            final JFrame errorForm = new JFrame("Ошибка");
+                            errorForm.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                            errorForm.setSize(500, 120);
+                            errorForm.setLocation(500, 200);
+                            errorForm.setVisible(true);
+                            JLabel jl = new JLabel("Невозможно зарегистрировать звонок абонента себе");
+                            JPanel grid = new JPanel(new GridLayout(1, 1));
+                            grid.add(jl);
+                            JPanel border = new JPanel(new BorderLayout());
+                            errorForm.add(border, BorderLayout.NORTH);
+                            border.add(grid,BorderLayout.CENTER);
+                        }
                         else {
                             srw.writeSubscr(strOut + ' ' + strIn + ' ' + cost);
                             for (int i = 0; i < sc.size(); i++)

@@ -26,11 +26,9 @@ public class SubscrReaderWriter implements Readable,ReWriteable, Writeable{
                 String chunks[] = line.split(" ");
                 ss.add(new Subscriber(chunks[1].toString() + ' ' + chunks[2].toString() +' ' + chunks[3].toString(), chunks[0].toString(), Double.valueOf(chunks[4])));
             }
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+            System.out.println("Can't read the file");
         }
         return ss;
     }
@@ -40,10 +38,9 @@ public class SubscrReaderWriter implements Readable,ReWriteable, Writeable{
             BufferedWriter writer = new BufferedWriter(fileWriter)) {
             writer.append(line);
             writer.append(System.getProperty("line.separator"));
-        }catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+            System.out.println("Can't write to the file");
         }
     }
 
@@ -54,10 +51,9 @@ public class SubscrReaderWriter implements Readable,ReWriteable, Writeable{
                 writer.write(sslist.get(i).getPhnumber() + ' ' + sslist.get(i).getName() + ' ' + Double.valueOf(sslist.get(i).getBalance()).toString());
                 writer.write(System.getProperty("line.separator"));
             }
-        }catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+            System.out.println("Can't overwrite the file");
         }
     }
 }

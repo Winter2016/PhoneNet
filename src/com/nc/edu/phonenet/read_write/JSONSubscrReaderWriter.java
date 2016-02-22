@@ -42,10 +42,9 @@ public class JSONSubscrReaderWriter implements Readable, Writeable {
             }
         } catch (ParseException e) {
             e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+            System.out.println("Can't read the file");
         }
         return sublist;
     }
@@ -63,7 +62,9 @@ public class JSONSubscrReaderWriter implements Readable, Writeable {
             writer.append(',');
             writer.append(System.getProperty("line.separator"));
             writer.close();
-        } catch (IOException ex) {
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Can't write to the file");
         }
     }
 }
