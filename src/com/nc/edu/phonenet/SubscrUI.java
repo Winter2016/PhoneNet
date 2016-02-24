@@ -95,25 +95,54 @@ public class SubscrUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 final JFrame addForm = new JFrame("Добавить");
                 addForm.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                addForm.setSize(300,100);
+                addForm.setSize(400,200);
                 addForm.setLocation(500, 200);
                 addForm.setVisible(true);
-                JPanel grid2 = new JPanel(new GridLayout(1, 2) );
-                final JTextField text1 = new JTextField("", 10);
+                JPanel grid2 = new JPanel(new GridLayout(5, 2) );
+                JPanel grid3 = new JPanel(new GridLayout(1, 1) );
                 JButton but4 = new JButton("Добавить");
+                final JTextField text1 = new JTextField("", 10);
+                JLabel jlab1 = new JLabel("Введите номер:");
+                final JTextField text2 = new JTextField("", 10);
+                JLabel jlab2 = new JLabel("Введите фамилию:");
+                final JTextField text3 = new JTextField("", 10);
+                JLabel jlab3 = new JLabel("Введите имя:");
+                final JTextField text4 = new JTextField("", 10);
+                JLabel jlab4 = new JLabel("Введите отчество:");
+                final JTextField text5 = new JTextField("", 10);
+                JLabel jlab5 = new JLabel("Введите баланс:");
+
+                grid2.add(jlab1);
                 grid2.add(text1);
-                grid2.add(but4);
+                grid2.add(jlab2);
+                grid2.add(text2);
+                grid2.add(jlab3);
+                grid2.add(text3);
+                grid2.add(jlab4);
+                grid2.add(text4);
+                grid2.add(jlab5);
+                grid2.add(text5);
+
+                grid3.add(but4);
 
                 JPanel border = new JPanel(new BorderLayout());
-                addForm.add(border, BorderLayout.NORTH);
+                addForm.add(border, BorderLayout.CENTER);
                 border.add(grid2,BorderLayout.CENTER);
+
+                JPanel border2 = new JPanel(new BorderLayout());
+                addForm.add(border2, BorderLayout.SOUTH);
+                border2.add(grid3,BorderLayout.CENTER);
 
                 but4.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        String str = text1.getText();
+                        String str1 = text1.getText();
+                        String str2 = text2.getText();
+                        String str3 = text3.getText();
+                        String str4 = text4.getText();
+                        String str5 = text5.getText();
                         SubscrReaderWriter sw = new SubscrReaderWriter("SubscriberList.txt");
-                            sw.writeSubscr(str);
+                            sw.writeSubscr(str1 + ' ' + str2 + ' ' + str3 + ' ' + str4 + ' ' + str5);
                     }
                 });
 
@@ -121,36 +150,47 @@ public class SubscrUI extends JFrame {
         });
 
         //слушатель кнопки Изменить
-        //пока работает так: надо ввести номер абонента и через пробел сумму, на которую изменяется баланс
         but3.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 final JFrame changeForm = new JFrame("Изменить");
                 changeForm.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                changeForm.setSize(300,100);
+                changeForm.setSize(400,120);
                 changeForm.setLocation(500, 200);
                 changeForm.setVisible(true);
-                JPanel grid2 = new JPanel(new GridLayout(1, 2) );
+                JPanel grid2 = new JPanel(new GridLayout(2, 2) );
+                JPanel grid3 = new JPanel(new GridLayout(1, 1) );
                 final JTextField text1 = new JTextField("", 10);
+                JLabel jlab1 = new JLabel("Введите номер абонента:");
+                final JTextField text2 = new JTextField("", 10);
+                JLabel jlab2 = new JLabel("Введите изменение баланса:");
                 JButton but4 = new JButton("Добавить");
+                grid2.add(jlab1);
                 grid2.add(text1);
-                grid2.add(but4);
+                grid2.add(jlab2);
+                grid2.add(text2);
+                grid3.add(but4);
 
                 JPanel border = new JPanel(new BorderLayout());
-                changeForm.add(border, BorderLayout.NORTH);
+                changeForm.add(border, BorderLayout.CENTER);
                 border.add(grid2,BorderLayout.CENTER);
+
+                JPanel border2 = new JPanel(new BorderLayout());
+                changeForm.add(border2, BorderLayout.SOUTH);
+                border2.add(grid3,BorderLayout.CENTER);
+
 
                 but4.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        String str = text1.getText();
-                        String chunks[] = str.split(" ");
+                        String str1 = text1.getText();
+                        String str2 = text2.getText();
                         SubscrReaderWriter sr = new SubscrReaderWriter("SubscriberList.txt");
                         List<Subscriber> ss =  sr.readSubscr();
                         for (int i = 0; i < ss.size(); i++) {
                             String subnumber = ss.get(i).getPhnumber();
-                            if ( subnumber.equals(chunks[0])) {
-                                ss.get(i).replenish(Double.valueOf(chunks[1]));
+                            if ( subnumber.equals(str1)) {
+                                ss.get(i).replenish(Double.valueOf(str2));
                             }
                         }
                         SubscrReaderWriter srw = new SubscrReaderWriter("SubscriberList.txt");
