@@ -19,52 +19,69 @@ import java.util.List;
  * Created by Ксения on 2/14/2016.
  */
 
-public class JSONSubscrReaderWriter implements Readable, Writeable {
+public class JSONSubscrReaderWriter implements SubscrReadWriteable {
     private String fileName;
     public JSONSubscrReaderWriter (String fName)
     {
         fileName = fName;
     }
-    public List<Subscriber> readSubscr()
+    public JSONArray readJSON()
     {
-        List<Subscriber> sublist = new ArrayList<>();
         JSONParser parser = new JSONParser();
-        String name;
+        JSONArray slist = new JSONArray();
         try {
-            Object obj = parser.parse(new FileReader(fileName));
-            JSONObject jsonObj = (JSONObject) obj;
-            JSONArray slist = (JSONArray) jsonObj.get("s_list");
-            List <JSONObject> slistObj = new ArrayList<>();
-            for(int i = 0; i< slist.size(); i++) {
-                slistObj.add(i, (JSONObject) slist.get(i));
-                name = slistObj.get(i).get("s_surname").toString() + ' ' + slistObj.get(0).get("s_fname").toString() + ' ' + slistObj.get(0).get("s_sname").toString();
-                sublist.add (i, new Subscriber(name, slistObj.get(0).get("s_number").toString(), (Double) slistObj.get(0).get("s_balance")));
-            }
+            JSONObject jsonObj = (JSONObject) parser.parse(new FileReader(fileName));
+            if (!jsonObj.isEmpty())
+                slist = (JSONArray) jsonObj.get("s_list");
         } catch (ParseException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Can't read the file");
         }
+        return slist;
+    }
+    public List<Subscriber> readSubscr()
+    {
+        List<Subscriber> sublist = new ArrayList<>();
+        String surname;
+        String firstname;
+        String secondname;
+        JSONArray slist = readJSON();
+        List <JSONObject> slistObj = new ArrayList<>();
+            for(int i = 0; i< slist.size(); i++) {
+                slistObj.add(i, (JSONObject) slist.get(i));
+                surname = slistObj.get(i).get("s_surname").toString();
+                firstname = slistObj.get(i).get("s_fname").toString();
+                secondname = slistObj.get(i).get("s_sname").toString();
+                sublist.add(i, new Subscriber(surname, firstname, secondname, slistObj.get(i).get("s_number").toString(), (Double) slistObj.get(i).get("s_balance")));
+            }
         return sublist;
     }
 
-    public void writeSubscr(String line) {
-        String chunks[] = line.split(" ");
+    public void writeSubscr(Subscriber ss) {
+        JSONArray slist = readJSON();
         JSONObject ob = new JSONObject();
-        ob.put("s_number", chunks[0]);
-        ob.put("s_surname", chunks[1]);
-        ob.put("s_fname", chunks[2]);
-        ob.put("s_sname", chunks[3]);
-        ob.put("s_balance", chunks[4]);
-        try (FileWriter writer = new FileWriter(fileName, true)){
-            writer.append(ob.toJSONString());
-            writer.append(',');
-            writer.append(System.getProperty("line.separator"));
+        ob.put("s_number", ss.getPhnumber());
+        ob.put("s_surname", ss.getSurName());
+        ob.put("s_fname", ss.getFirstName());
+        ob.put("s_sname", ss.getSecondName());
+        ob.put("s_balance", ss.getBalance());
+        slist.add(ob);
+        JSONObject jo = new JSONObject();
+        jo.put("s_list", slist);
+        try (FileWriter writer = new FileWriter(fileName)){
+            writer.write(jo.toJSONString());
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Can't write to the file");
+        }
+    }
+
+    public void rewriteSubscr(List<Subscriber> sslist) {
+        for (Subscriber ss:sslist) {
+            writeSubscr(ss);
         }
     }
 }

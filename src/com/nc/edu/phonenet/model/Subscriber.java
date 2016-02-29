@@ -4,12 +4,16 @@ package com.nc.edu.phonenet.model;
  * Created by Ксения on 2/4/2016.
  */
 public class Subscriber implements Replenishable {
-    private String name;
+    private String surName;
+    private String firstName;
+    private String secondName;
     private String phnumber;
     private double balance;
-    public Subscriber(String nam, String phnum, double bal)
+    public Subscriber(String surnam, String fnam, String snam,  String phnum, double bal)
     {
-        name = nam;
+        surName = surnam;
+        firstName = fnam;
+        secondName = snam;
         phnumber = phnum;
         balance = bal;
     }
@@ -18,8 +22,20 @@ public class Subscriber implements Replenishable {
         balance -= sum;
     }
 
-    public String getName() {
-        return name;
+    public String getFullName() {
+        return surName + ' ' + firstName + ' ' + secondName;
+    }
+
+    public String getSurName() {
+        return surName;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getSecondName() {
+        return secondName;
     }
 
     public String getPhnumber() {
@@ -28,6 +44,11 @@ public class Subscriber implements Replenishable {
 
     public double getBalance() {
         return balance;
+    }
+
+    @Override
+    public String toString() {
+        return this.getPhnumber() + ' ' + this.getFullName() + ' ' + Double.valueOf(this.getBalance()).toString();
     }
 
 }

@@ -13,7 +13,7 @@ import java.util.List;
  * Created by Ксения on 2/6/2016.
  */
 public class SubscrUI extends JFrame {
-    public SubscrUI() {
+   /* public SubscrUI() {
         super("Абоненты");
         setTitle("Абоненты");
         setSize(370, 100);
@@ -285,5 +285,5 @@ public class SubscrUI extends JFrame {
                 new SubscrUI();
             }
         });
-    }
+    }*/
 }

@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by Ксения on 2/13/2016.
  */
-public class SubscrReaderWriter implements Readable,ReWriteable, Writeable{
+public class SubscrReaderWriter implements SubscrReadWriteable{
     private String fileName;
     public SubscrReaderWriter (String fName)
     {
@@ -24,7 +24,7 @@ public class SubscrReaderWriter implements Readable,ReWriteable, Writeable{
 
             while ((line = reader.readLine()) != null) {
                 String chunks[] = line.split(" ");
-                ss.add(new Subscriber(chunks[1].toString() + ' ' + chunks[2].toString() +' ' + chunks[3].toString(), chunks[0].toString(), Double.valueOf(chunks[4])));
+                ss.add(new Subscriber(chunks[1].toString(), chunks[2].toString(),chunks[3].toString(), chunks[0].toString(), Double.valueOf(chunks[4])));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -33,10 +33,10 @@ public class SubscrReaderWriter implements Readable,ReWriteable, Writeable{
         return ss;
     }
 
-    public void writeSubscr(String line) {
+    public void writeSubscr(Subscriber ss) {
         try(FileWriter fileWriter = new FileWriter(fileName, true);
             BufferedWriter writer = new BufferedWriter(fileWriter)) {
-            writer.append(line);
+            writer.append(ss.toString());
             writer.append(System.getProperty("line.separator"));
         } catch (IOException e) {
             e.printStackTrace();
@@ -48,7 +48,7 @@ public class SubscrReaderWriter implements Readable,ReWriteable, Writeable{
         try(FileWriter fileWriter = new FileWriter(fileName);
             BufferedWriter writer = new BufferedWriter(fileWriter)) {
             for (int i = 0; i < sslist.size(); i++) {
-                writer.write(sslist.get(i).getPhnumber() + ' ' + sslist.get(i).getName() + ' ' + Double.valueOf(sslist.get(i).getBalance()).toString());
+                writer.write(sslist.get(i).toString());
                 writer.write(System.getProperty("line.separator"));
             }
         } catch (IOException e) {
