@@ -13,4 +13,16 @@ public class CallRegister {
         this.inCaller = inCaller;
         this.cost = cost;
     }
+
+    public Subscriber getOutCaller() {
+        return outCaller;
+    }
+
+    public Subscriber getInCaller() {
+        return inCaller;
+    }
+
+    public double getCost() {
+        return cost;
+    }
 }
