@@ -4,7 +4,6 @@ import com.nc.edu.phonenet.model.CallRegister;
 import com.nc.edu.phonenet.model.Subscriber;
 import com.nc.edu.phonenet.read_write.CallRegReaderWriter;
 import com.nc.edu.phonenet.read_write.JSONSubscrReaderWriter;
-import com.nc.edu.phonenet.read_write.SubscrReaderWriter;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -71,7 +70,6 @@ public class SubscrForm extends JFrame{
                     String subnumber = subscr.getPhnumber();
                     if ((subname.contains(str) || subnumber.contains(str)) && !str.isEmpty()) {
                         listModel.addElement(subnumber + ' ' + subname + ' ' + subscr.getBalance());
-
                     }
                 }
                 if (listModel.isEmpty())
