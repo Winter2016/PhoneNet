@@ -51,4 +51,7 @@ public class Subscriber implements Replenishable {
         return this.getPhnumber() + ' ' + this.getFullName() + ' ' + Double.valueOf(this.getBalance()).toString();
     }
 
+    public boolean equalsSubscr(Subscriber sc) {
+        return (this.getFullName().equals(sc.getFullName())&&this.getPhnumber().equals(sc.getPhnumber())&&(this.getBalance()==sc.getBalance()));
+    }
 }

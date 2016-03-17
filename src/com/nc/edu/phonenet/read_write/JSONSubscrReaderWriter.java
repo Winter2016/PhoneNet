@@ -49,13 +49,15 @@ public class JSONSubscrReaderWriter implements SubscrReadWriteable {
         String secondname;
         JSONArray slist = readJSON();
         List <JSONObject> slistObj = new ArrayList<>();
-            for(int i = 0; i< slist.size(); i++) {
+        if (!slist.isEmpty()) {
+            for (int i = 0; i < slist.size(); i++) {
                 slistObj.add(i, (JSONObject) slist.get(i));
                 surname = slistObj.get(i).get("s_surname").toString();
                 firstname = slistObj.get(i).get("s_fname").toString();
                 secondname = slistObj.get(i).get("s_sname").toString();
                 sublist.add(i, new Subscriber(surname, firstname, secondname, slistObj.get(i).get("s_number").toString(), (Double) slistObj.get(i).get("s_balance")));
             }
+        }
         return sublist;
     }
 
@@ -80,6 +82,13 @@ public class JSONSubscrReaderWriter implements SubscrReadWriteable {
     }
 
     public void rewriteSubscr(List<Subscriber> sslist) {
+        try (FileWriter writer = new FileWriter(fileName)){
+            writer.write("");
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Can't clear the file");
+        }
         for (Subscriber ss:sslist) {
             writeSubscr(ss);
         }
