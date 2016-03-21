@@ -1,5 +1,8 @@
 package com.nc.edu.phonenet;
 
+import com.nc.edu.phonenet.DAO.CallRegisterDAO;
+import com.nc.edu.phonenet.DAO.DAO;
+import com.nc.edu.phonenet.DAO.SubscriberDAO;
 import com.nc.edu.phonenet.handlers.CallRegHandler;
 import com.nc.edu.phonenet.handlers.SubscrHandler;
 import com.nc.edu.phonenet.model.CallRegister;
@@ -7,6 +10,7 @@ import com.nc.edu.phonenet.model.Subscriber;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -42,8 +46,7 @@ public class SubscrForm extends JFrame{
     private JButton regBut;
     private JList findList;
 
-    public SubscrForm()
-    {
+    public SubscrForm() throws SQLException, ClassNotFoundException {
         super("Абоненты");
         setTitle("Абоненты");
         setPreferredSize(new Dimension(640, 280));
@@ -53,8 +56,14 @@ public class SubscrForm extends JFrame{
         pack();
         setVisible(true);
         final DefaultListModel listModel = new DefaultListModel();
-        final SubscrHandler sh = new SubscrHandler("SubscriberList.txt");
-        final CallRegHandler crh = new CallRegHandler("CallReg.txt");
+        //final SubscrHandler sh = new SubscrHandler("SubscriberList.txt");
+        //final CallRegHandler crh = new CallRegHandler("CallReg.txt");
+        DAO dao = new DAO();
+        dao.connect();
+        final CallRegisterDAO callRegisterDAO = new CallRegisterDAO();
+        final SubscriberDAO subscriberDAO = new SubscriberDAO();
+        subscriberDAO.createTableSubscriber();
+        callRegisterDAO.createTableCallRegister();
 
         findList.setModel(listModel);
         findBut.addActionListener(new ActionListener() {
@@ -64,7 +73,12 @@ public class SubscrForm extends JFrame{
                 findList.setFocusable(false);
                 listModel.removeAllElements();
                 String str = findTextField.getText();
-                sh.findSubscr(str,listModel);
+                try {
+                    subscriberDAO.findSubscr(str,listModel);
+                } catch (SQLException e1) {
+                    System.out.println("Can't process the function findSunscr");
+                    e1.printStackTrace();
+                }
 
             }
         });
@@ -81,7 +95,12 @@ public class SubscrForm extends JFrame{
                 if (str1.isEmpty()||str2.isEmpty()||str4.isEmpty()||str5.isEmpty())
                     JOptionPane.showMessageDialog(addPanel, "Заполните пустые поля");
                 else
-                sh.getJsrw().writeSubscr(new Subscriber( str1, str2, str3, str4,Double.valueOf(str5)));
+                    try {
+                        subscriberDAO.writeTableSubscriber(new Subscriber( str1, str2, str3, str4,Double.valueOf(str5)));
+                    } catch (SQLException e1) {
+                        System.out.println("Can't process the function writeTableSubscriber");
+                        e1.printStackTrace();
+                    }
             }
         });
 
@@ -90,31 +109,64 @@ public class SubscrForm extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 String phNumber = chPhTextField.getText();
                 Double cost = Double.valueOf(chBalTextField.getText());
-                sh.changeBalance(phNumber, cost);
+                try {
+                    subscriberDAO.changeBalance(phNumber, cost);
+                } catch (SQLException e1) {
+                    System.out.println("Can't process the function changeBalance");
+                    e1.printStackTrace();
+                }
             }
         });
 
-        List <Subscriber> sc = sh.getSslist();
-        Subscriber[] subscribers = sc.toArray(new Subscriber[sc.size()]);
+        selectPane.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                List <Subscriber> sc = null;
+                try {
+                    sc = subscriberDAO.readTableSubscriber();
+                } catch (ClassNotFoundException e1) {
+                    e1.printStackTrace();
+                    System.out.println("Can't find class Subscriber");
+                } catch (SQLException e1) {
+                    System.out.println("Can't process the function readTableSubscriber");
+                    e1.printStackTrace();
+                }
+                Subscriber[] subscribers = sc.toArray(new Subscriber[sc.size()]);
         final DefaultComboBoxModel<Subscriber> comboModelOut = new DefaultComboBoxModel<>(subscribers);
         final DefaultComboBoxModel<Subscriber> comboModelIn = new DefaultComboBoxModel<>(subscribers);
         combOut.setModel(comboModelOut);
         combIn.setModel(comboModelIn);
-
+            }
+        });
         regBut.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                List <Subscriber> sc = sh.getSslist();
                 Double cost = Double.valueOf(costRegTextField.getText());
                 Subscriber strOut = (Subscriber) combOut.getSelectedItem();
                 Subscriber strIn = (Subscriber) combIn.getSelectedItem();
                 if (strOut.equalsSubscr(strIn))
                     JOptionPane.showMessageDialog(callRegPanel, "Невозможно зарегистрировать звонок абонента самому себе");
                 else {
-                    sh.changeBalance(strOut, cost);
-                    crh.getCrrw().writeCallReg(new CallRegister(strOut, strIn, cost));
+                    try {
+                        subscriberDAO.changeBalance(strOut, cost);
+                    } catch (SQLException e1) {
+                        e1.printStackTrace();
+                        System.out.println("Can't process the function changeBalance");
+                    }
+                    try {
+                        callRegisterDAO.writeTableCallRegister(new CallRegister(strOut, strIn, cost));
+                    } catch (SQLException e1) {
+                        e1.printStackTrace();
+                        System.out.println("Can't process the function writeTableCallRegister");
+                    } catch (ClassNotFoundException e1) {
+                        e1.printStackTrace();
+                        System.out.println("Can't find the class CallRegisterS");
+                    }
                 }
             }
         });
+        subscriberDAO.closeDB();
+        callRegisterDAO.closeDB();
+        dao.closeDB();
     }
 }

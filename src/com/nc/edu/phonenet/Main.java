@@ -1,7 +1,8 @@
 package com.nc.edu.phonenet;
 
-import com.nc.edu.phonenet.database.CallRegDBHandler;
-import com.nc.edu.phonenet.database.SubscrDBHandler;
+import com.nc.edu.phonenet.DAO.CallRegisterDAO;
+import com.nc.edu.phonenet.DAO.DAO;
+import com.nc.edu.phonenet.DAO.SubscriberDAO;
 import com.nc.edu.phonenet.model.CallRegister;
 import com.nc.edu.phonenet.model.Subscriber;
 
@@ -24,11 +25,6 @@ import org.json.simple.parser.ParseException;
  */
 public class Main {
   public static void main(String [] args) throws SQLException, ClassNotFoundException {
-    //SubscrForm sf = new SubscrForm();
-      SubscrDBHandler subscrDBHandler = new SubscrDBHandler();
-      subscrDBHandler.Conn();
-      subscrDBHandler.CreateTable();
-      Subscriber ss = subscrDBHandler.FindSubscr(2);
-      System.out.println(ss);
+      SubscrForm sf = new SubscrForm();
   }
 }
