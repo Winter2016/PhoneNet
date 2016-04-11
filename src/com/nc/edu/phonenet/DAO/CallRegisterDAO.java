@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class CallRegisterDAO extends DAO {
     public static Statement statmt;
-    public static ResultSet resSet = null;
+    public static ResultSet resSet;
     public static PreparedStatement prepStat;
 
     // CallRegister table creation
