@@ -3,6 +3,7 @@ package com.nc.edu.phonenet.DAO;
 import com.nc.edu.phonenet.model.CallRegister;
 import com.nc.edu.phonenet.model.Subscriber;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -14,7 +15,8 @@ import java.util.List;
  */
 public class CallRegisterDAO extends DAO {
     public static Statement statmt;
-    public static ResultSet resSet;
+    public static ResultSet resSet = null;
+    public static PreparedStatement prepStat;
 
     // CallRegister table creation
     public static void createTableCallRegister () throws ClassNotFoundException, SQLException
@@ -28,8 +30,13 @@ public class CallRegisterDAO extends DAO {
         SubscriberDAO subscriberDAO = new SubscriberDAO();
         Integer id_out = subscriberDAO.findIDByPhnumber(callreg.getOutCaller().getPhnumber());
         Integer id_in = subscriberDAO.findIDByPhnumber(callreg.getInCaller().getPhnumber());
-        String statforexe = "INSERT INTO 'CallRegister' ('id_out', 'id_in', 'cost') VALUES  (" + id_out + ", " + id_in + ", " + callreg.getCost() + ");";
-        statmt.execute(statforexe);
+        String statforexe = "INSERT INTO 'CallRegister' ('id_out', 'id_in', 'cost') VALUES  (?, ?, ?);";
+        prepStat = conn.prepareStatement(statforexe);
+        //Почему-то не воспринимает просто число в первом аргументе
+        prepStat.setInt(Integer.valueOf(1),id_out);
+        prepStat.setInt(Integer.valueOf(2), id_in);
+        prepStat.setDouble(Integer.valueOf(3), callreg.getCost());
+        prepStat.executeUpdate();
     }
 
     public  static void writeTableCallRegister (List<CallRegister> crlist) throws SQLException, ClassNotFoundException {
@@ -61,8 +68,10 @@ public class CallRegisterDAO extends DAO {
     //Delete string from table
 
     public void deleteFromCallRegisterByID (int id) throws SQLException {
-        String statforexe = "DELETE FROM CallRegister WHERE id = '" +id + "';";
-        statmt.execute(statforexe);
+        String statforexe = "DELETE FROM CallRegister WHERE id = ?;";
+        prepStat = conn.prepareStatement(statforexe);
+        prepStat.setInt(Integer.valueOf(1),id);
+        prepStat.executeUpdate();
     }
 
     // Close connection
