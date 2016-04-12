@@ -77,6 +77,7 @@ public class CallRegisterDAO extends DAO {
     // Close connection
     public static void closeDB() throws ClassNotFoundException, SQLException
     {
-        resSet.close();
+        if(resSet!=null)
+            resSet.close();
     }
 }

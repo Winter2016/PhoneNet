@@ -155,6 +155,7 @@ public class SubscriberDAO extends DAO{
     // Close connection
     public static void closeDB() throws ClassNotFoundException, SQLException
     {
+        if(resSet!=null)
             resSet.close();
     }
 }
