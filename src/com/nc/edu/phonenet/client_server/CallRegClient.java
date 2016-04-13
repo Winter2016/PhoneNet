@@ -21,11 +21,13 @@ public class CallRegClient {
         socket = new Socket(HOST, PORT);
         outputStream = socket.getOutputStream();
         objectOutputStream = new ObjectOutputStream(outputStream);
-        String outPhNumber = "12335";
-        String inPhNumber = "56778";
+        String outPhNumber = "9065976843";
+        String inPhNumber = "9089403587";
+        Double cost = 20.0;
         JSONObject obj = new JSONObject();
         obj.put("outPhNumber", outPhNumber);
         obj.put("inPhNumber", inPhNumber);
+        obj.put("cost", cost);
         String outPutJSONString = obj.toJSONString();
         objectOutputStream.writeObject(outPutJSONString);
         objectInputStream = new ObjectInputStream(socket.getInputStream());

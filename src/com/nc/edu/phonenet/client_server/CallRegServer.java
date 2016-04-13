@@ -1,11 +1,17 @@
 package com.nc.edu.phonenet.client_server;
 
+import com.nc.edu.phonenet.DAO.CallRegisterDAO;
+import com.nc.edu.phonenet.DAO.DAO;
+import com.nc.edu.phonenet.DAO.SubscriberDAO;
+import com.nc.edu.phonenet.model.CallRegister;
+import com.nc.edu.phonenet.model.Subscriber;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 
 /**
  * Created by Ксения on 4/12/2016.
@@ -33,6 +39,9 @@ public class CallRegServer implements Runnable {
         this.ID = i;
     }
     public void run() {
+        DAO dao = null;
+        CallRegisterDAO callRegisterDAO = null;
+        SubscriberDAO subscriberDAO = null;
         try {
             ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
             JSONParser parser = new JSONParser();
@@ -40,7 +49,21 @@ public class CallRegServer implements Runnable {
             JSONObject jsonObj = (JSONObject) parser.parse(str);
             String outPhNumber = jsonObj.get("outPhNumber").toString();
             String inPhNumber = jsonObj.get("inPhNumber").toString();
-            String results = outPhNumber + " calls " + inPhNumber;
+            Double cost = (Double)jsonObj.get("cost");
+            dao = new DAO();
+            dao.connect();
+            callRegisterDAO = new CallRegisterDAO();
+            subscriberDAO = new SubscriberDAO();
+            subscriberDAO.createTableSubscriber();
+            callRegisterDAO.createTableCallRegister();
+            int outID = subscriberDAO.findIDByPhnumber(outPhNumber);
+            int inID = subscriberDAO.findIDByPhnumber(inPhNumber);
+            Subscriber outSubscr = subscriberDAO.findSubscrByID(outID);
+            Subscriber intSubscr = subscriberDAO.findSubscrByID(inID);
+            subscriberDAO.changeBalance(outPhNumber, cost);
+            CallRegister callRegister = new CallRegister(outSubscr, intSubscr, cost);
+            callRegisterDAO.writeTableCallRegister(callRegister);
+            String results = "Successfully written";
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             objectOutputStream.writeObject(results);
         }
@@ -50,8 +73,17 @@ public class CallRegServer implements Runnable {
         finally {
             try {
                 socket.close();
+                if(subscriberDAO!=null) subscriberDAO.closeDB();
+                if(callRegisterDAO!=null) callRegisterDAO.closeDB();
+                if (dao!=null) dao.closeDB();
             }
-            catch (IOException e){}
+            catch (IOException e){} catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                System.out.println(e);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println(e);
+            }
         }
     }
 }
