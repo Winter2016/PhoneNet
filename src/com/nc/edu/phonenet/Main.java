@@ -9,6 +9,7 @@ import java.sql.SQLException;
  */
 public class Main {
   public static void main(String [] args) throws SQLException, ClassNotFoundException {
-      SubscrForm sf = new SubscrForm();
+      //SubscrForm sf = new SubscrForm();
+      CallRegForm callRegForm = new CallRegForm();
   }
 }

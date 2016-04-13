@@ -12,8 +12,18 @@ import java.net.UnknownHostException;
 public class CallRegClient {
     public static final String HOST = "localhost";
     public static final int PORT = 7777;
+    public static String outPhNumber = "";
+    public static String inPhNumber = "";
+    public static Double cost = 0.0;
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
+    public CallRegClient(String outPhNumber, String inPhNumber, Double cost) {
+        this.outPhNumber = outPhNumber;
+        this.inPhNumber = inPhNumber;
+        this.cost = cost;
+    }
+
+    //public static void main(String[] args) throws IOException, ClassNotFoundException {
+    public static void runMain() throws IOException, ClassNotFoundException {
         Socket socket = null;
         OutputStream outputStream = null;
         ObjectOutputStream objectOutputStream = null;
@@ -21,9 +31,6 @@ public class CallRegClient {
         socket = new Socket(HOST, PORT);
         outputStream = socket.getOutputStream();
         objectOutputStream = new ObjectOutputStream(outputStream);
-        String outPhNumber = "9065976843";
-        String inPhNumber = "9089403587";
-        Double cost = 20.0;
         JSONObject obj = new JSONObject();
         obj.put("outPhNumber", outPhNumber);
         obj.put("inPhNumber", inPhNumber);
