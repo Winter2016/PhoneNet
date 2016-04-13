@@ -42,6 +42,7 @@ public class CallRegServer implements Runnable {
         DAO dao = null;
         CallRegisterDAO callRegisterDAO = null;
         SubscriberDAO subscriberDAO = null;
+        String results = "Can't register";
         try {
             ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
             JSONParser parser = new JSONParser();
@@ -60,10 +61,18 @@ public class CallRegServer implements Runnable {
             int inID = subscriberDAO.findIDByPhnumber(inPhNumber);
             Subscriber outSubscr = subscriberDAO.findSubscrByID(outID);
             Subscriber intSubscr = subscriberDAO.findSubscrByID(inID);
-            subscriberDAO.changeBalance(outPhNumber, cost);
-            CallRegister callRegister = new CallRegister(outSubscr, intSubscr, cost);
-            callRegisterDAO.writeTableCallRegister(callRegister);
-            String results = "Successfully written";
+            if(subscriberDAO.findIsFreeByPhnumber(outPhNumber)&&subscriberDAO.findIsFreeByPhnumber(inPhNumber)) {
+                subscriberDAO.setIsFree(false, outID);
+                subscriberDAO.setIsFree(false, inID);
+                subscriberDAO.changeBalance(outPhNumber, cost);
+                CallRegister callRegister = new CallRegister(outSubscr, intSubscr, cost);
+                callRegisterDAO.writeTableCallRegister(callRegister);
+                results = "Successfully written";
+                subscriberDAO.setIsFree(true, outID);
+                subscriberDAO.setIsFree(true, inID);
+            }
+            else
+                results = "Subscriber is busy";
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             objectOutputStream.writeObject(results);
         }

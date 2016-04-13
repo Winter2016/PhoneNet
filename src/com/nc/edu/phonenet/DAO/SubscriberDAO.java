@@ -22,7 +22,7 @@ public class SubscriberDAO extends DAO{
     public static void createTableSubscriber() throws ClassNotFoundException, SQLException
     {
         statmt = conn.createStatement();
-        statmt.execute("CREATE TABLE if not exists 'Subscriber' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'surname' text, 'fname' text, 'sname' text, 'phnumber' text, 'balance' real);");
+        statmt.execute("CREATE TABLE if not exists 'Subscriber' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'surname' text, 'fname' text, 'sname' text, 'phnumber' text, 'balance' real, 'isFree' boolean);");
     }
     //Filling table
     public static void writeTableSubscriber(Subscriber sc) throws SQLException
@@ -32,7 +32,7 @@ public class SubscriberDAO extends DAO{
         String sname = sc.getSecondName();
         String phnumber = sc.getPhnumber();
         Double balance = sc.getBalance();
-        String statforexe = "INSERT INTO 'Subscriber' ('surname', 'fname', 'sname', 'phnumber', 'balance') VALUES  (?,?,?,?,?);";
+        String statforexe = "INSERT INTO 'Subscriber' ('surname', 'fname', 'sname', 'phnumber', 'balance', 'isFree') VALUES  (?,?,?,?,?, 'true');";
         prepStat = conn.prepareStatement(statforexe);
         prepStat.setString(Integer.valueOf(1),surname);
         prepStat.setString(Integer.valueOf(2), fname);
@@ -149,6 +149,23 @@ public class SubscriberDAO extends DAO{
         String statforexe = "DELETE FROM Subscriber WHERE id = ?;";
         prepStat = conn.prepareStatement(statforexe);
         prepStat.setInt(Integer.valueOf(1),id);
+        prepStat.executeUpdate();
+    }
+
+    //Find isFreeByPhNumber
+    public boolean findIsFreeByPhnumber(String phnumber) throws ClassNotFoundException, SQLException {
+        String statforexe = "SELECT idFree FROM Subscriber WHERE phnumber = ?;";
+        prepStat = conn.prepareStatement(statforexe);
+        prepStat.setString(Integer.valueOf(1),phnumber);
+        resSet = prepStat.executeQuery();
+        return resSet.getBoolean("isFree");
+    }
+
+    public void setIsFree (boolean isFree, int id) throws SQLException {
+        String statforexe = "UPDATE Subscriber SET ifFree = ? WHERE id = ?;";
+        prepStat = conn.prepareStatement(statforexe);
+        prepStat.setBoolean(Integer.valueOf(1),isFree);
+        prepStat.setInt(Integer.valueOf(2),id);
         prepStat.executeUpdate();
     }
 
