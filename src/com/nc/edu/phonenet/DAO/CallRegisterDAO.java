@@ -14,32 +14,29 @@ import java.util.List;
  * Created by Ксения on 3/21/2016.
  */
 public class CallRegisterDAO extends DAO {
-    public static Statement statmt;
-    public static ResultSet resSet;
-    public static PreparedStatement prepStat;
 
     // CallRegister table creation
-    public static void createTableCallRegister () throws ClassNotFoundException, SQLException
-    {
-        statmt = conn.createStatement();
-        statmt.execute("CREATE TABLE if not exists 'CallRegister' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'id_out' INTEGER FOREIGH KEY REFERENCES Subscriber(id), 'id_in' INTEGER FOREIGH KEY REFERENCES Subscriber(id), 'cost' real);");
+    public void createTableCallRegister () throws ClassNotFoundException, SQLException {
+        try (Statement statmt = conn.createStatement()) {
+            statmt.execute("CREATE TABLE if not exists 'CallRegister' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'id_out' INTEGER FOREIGH KEY REFERENCES Subscriber(id), 'id_in' INTEGER FOREIGH KEY REFERENCES Subscriber(id), 'cost' real);");
+        }
     }
 
     //Filling CallRegister table
-    public static void writeTableCallRegister(CallRegister callreg) throws SQLException, ClassNotFoundException {
+    public void writeTableCallRegister(CallRegister callreg) throws SQLException, ClassNotFoundException {
         SubscriberDAO subscriberDAO = new SubscriberDAO();
         Integer id_out = subscriberDAO.findIDByPhnumber(callreg.getOutCaller().getPhnumber());
         Integer id_in = subscriberDAO.findIDByPhnumber(callreg.getInCaller().getPhnumber());
         String statforexe = "INSERT INTO 'CallRegister' ('id_out', 'id_in', 'cost') VALUES  (?, ?, ?);";
-        prepStat = conn.prepareStatement(statforexe);
-        //Почему-то не воспринимает просто число в первом аргументе
-        prepStat.setInt(Integer.valueOf(1),id_out);
-        prepStat.setInt(Integer.valueOf(2), id_in);
-        prepStat.setDouble(Integer.valueOf(3), callreg.getCost());
+        try (PreparedStatement  prepStat = conn.prepareStatement(statforexe)) {
+        prepStat.setInt(1, id_out);
+        prepStat.setInt(2, id_in);
+        prepStat.setDouble(3, callreg.getCost());
         prepStat.executeUpdate();
     }
+    }
 
-    public  static void writeTableCallRegister (List<CallRegister> crlist) throws SQLException, ClassNotFoundException {
+    public void writeTableCallRegister (List<CallRegister> crlist) throws SQLException, ClassNotFoundException {
         for(CallRegister cr : crlist)
         {
             writeTableCallRegister(cr);
@@ -47,20 +44,20 @@ public class CallRegisterDAO extends DAO {
     }
 
     // Table output
-    public static List<CallRegister> readTableCallRegister() throws ClassNotFoundException, SQLException
+    public List<CallRegister> readTableCallRegister() throws ClassNotFoundException, SQLException
     {
         List<CallRegister> crlist = new ArrayList<>();
-        resSet = statmt.executeQuery("SELECT * FROM CallRegister");
         SubscriberDAO subscriberDAO = new SubscriberDAO();
-        while(resSet.next())
-        {
-            int id = resSet.getInt("id");
-            int id_out = resSet.getInt("id_out");
-            int id_in = resSet.getInt("id_in");
-            Double cost = resSet.getDouble("cost");
-            Subscriber outScr = subscriberDAO.findSubscrByID(id_out);
-            Subscriber inScr = subscriberDAO.findSubscrByID(id_in);
-            crlist.add(new CallRegister(outScr, inScr, cost));
+        try(Statement statmt = conn.createStatement();
+        ResultSet resSet = statmt.executeQuery("SELECT * FROM CallRegister")) {
+            while (resSet.next()) {
+                int id_out = resSet.getInt("id_out");
+                int id_in = resSet.getInt("id_in");
+                Double cost = resSet.getDouble("cost");
+                Subscriber outScr = subscriberDAO.findSubscrByID(id_out);
+                Subscriber inScr = subscriberDAO.findSubscrByID(id_in);
+                crlist.add(new CallRegister(outScr, inScr, cost));
+            }
         }
         return crlist;
     }
@@ -69,15 +66,10 @@ public class CallRegisterDAO extends DAO {
 
     public void deleteFromCallRegisterByID (int id) throws SQLException {
         String statforexe = "DELETE FROM CallRegister WHERE id = ?;";
-        prepStat = conn.prepareStatement(statforexe);
-        prepStat.setInt(Integer.valueOf(1),id);
-        prepStat.executeUpdate();
+        try( PreparedStatement  prepStat = conn.prepareStatement(statforexe)) {
+            prepStat.setInt(1, id);
+            prepStat.executeUpdate();
+        }
     }
 
-    // Close connection
-    public static void closeDB() throws ClassNotFoundException, SQLException
-    {
-        if(resSet!=null)
-            resSet.close();
-    }
 }

@@ -20,9 +20,10 @@ public class CallRegServer implements Runnable {
     private Socket socket;
     private int ID;
     public static final int PORT = 7777;
+
     public static void main(String[] args) {
         int count = 0;
-        try{
+        try {
             ServerSocket serverSocket = new ServerSocket(PORT);
             System.out.println("MultipleSocketServer Initialized");
             while (true) {
@@ -31,69 +32,74 @@ public class CallRegServer implements Runnable {
                 Thread thread = new Thread(runnable);
                 thread.start();
             }
+        } catch (Exception e) {
         }
-        catch (Exception e) {}
     }
+
     CallRegServer(Socket s, int i) {
         this.socket = s;
         this.ID = i;
     }
+
     public void run() {
         DAO dao = null;
-        CallRegisterDAO callRegisterDAO = null;
-        SubscriberDAO subscriberDAO = null;
+        CallRegisterDAO callRegisterDAO;
+        SubscriberDAO subscriberDAO;
         String results = "Can't register";
+        dao = new DAO();
+        callRegisterDAO = new CallRegisterDAO();
+        subscriberDAO = new SubscriberDAO();
         try {
-            ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
-            JSONParser parser = new JSONParser();
-            String str = (String) inputStream.readObject();
-            JSONObject jsonObj = (JSONObject) parser.parse(str);
-            String outPhNumber = jsonObj.get("outPhNumber").toString();
-            String inPhNumber = jsonObj.get("inPhNumber").toString();
-            Double cost = (Double)jsonObj.get("cost");
-            dao = new DAO();
             dao.connect();
-            callRegisterDAO = new CallRegisterDAO();
-            subscriberDAO = new SubscriberDAO();
             subscriberDAO.createTableSubscriber();
             callRegisterDAO.createTableCallRegister();
-            int outID = subscriberDAO.findIDByPhnumber(outPhNumber);
-            int inID = subscriberDAO.findIDByPhnumber(inPhNumber);
-            Subscriber outSubscr = subscriberDAO.findSubscrByID(outID);
-            Subscriber intSubscr = subscriberDAO.findSubscrByID(inID);
-            if(subscriberDAO.findIsFreeByPhnumber(outPhNumber)&&subscriberDAO.findIsFreeByPhnumber(inPhNumber)) {
-                subscriberDAO.setIsFree(false, outID);
-                subscriberDAO.setIsFree(false, inID);
-                subscriberDAO.changeBalance(outPhNumber, cost);
-                CallRegister callRegister = new CallRegister(outSubscr, intSubscr, cost);
-                callRegisterDAO.writeTableCallRegister(callRegister);
-                results = "Successfully written";
-                subscriberDAO.setIsFree(true, outID);
-                subscriberDAO.setIsFree(true, inID);
-            }
-            else
-                results = "Subscriber is busy";
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-            objectOutputStream.writeObject(results);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        catch (Exception e) {
-            System.out.println(e);
-        }
-        finally {
-            try {
-                socket.close();
-                if(subscriberDAO!=null) subscriberDAO.closeDB();
-                if(callRegisterDAO!=null) callRegisterDAO.closeDB();
-                if (dao!=null) dao.closeDB();
+        try (ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream())) {
+            JSONParser parser = new JSONParser();
+            String str = (String) inputStream.readObject();
+            if (str != null) {
+                JSONObject jsonObj = (JSONObject) parser.parse(str);
+                String outPhNumber = jsonObj.get("outPhNumber").toString();
+                String inPhNumber = jsonObj.get("inPhNumber").toString();
+                Double cost = (Double) jsonObj.get("cost");
+                int outID = subscriberDAO.findIDByPhnumber(outPhNumber);
+                int inID = subscriberDAO.findIDByPhnumber(inPhNumber);
+                Subscriber outSubscr = subscriberDAO.findSubscrByID(outID);
+                Subscriber intSubscr = subscriberDAO.findSubscrByID(inID);
+                    if (subscriberDAO.findIsFreeByPhnumber(outPhNumber) && subscriberDAO.findIsFreeByPhnumber(inPhNumber)) {
+                        while (true) {
+                            subscriberDAO.setIsFree(false, outID);
+                            subscriberDAO.setIsFree(false, inID);
+                        }
+                        subscriberDAO.changeBalance(outPhNumber, cost);
+                        CallRegister callRegister = new CallRegister(outSubscr, intSubscr, cost);
+                        callRegisterDAO.writeTableCallRegister(callRegister);
+                        results = "Successfully written";
+                        subscriberDAO.setIsFree(true, outID);
+                        subscriberDAO.setIsFree(true, inID);
+                    } else
+                        results = "Subscriber is busy";
+                    ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                    objectOutputStream.writeObject(results);
+
             }
-            catch (IOException e){} catch (ClassNotFoundException e) {
-                e.printStackTrace();
+            else{
+                    //не видит
+                    //thread.sleep(500);
+                }
+            }catch(Exception e){
                 System.out.println(e);
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.out.println(e);
+            }finally{
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                }
             }
         }
     }
-}
+
 

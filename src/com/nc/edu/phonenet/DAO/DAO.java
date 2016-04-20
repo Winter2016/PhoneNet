@@ -23,4 +23,18 @@ public class DAO {
     {
         conn.close();
     }
+
+    private static volatile DAO dao;
+    public static DAO getDao() {
+        DAO localDao = dao;
+        if (localDao == null) {
+            synchronized (DAO.class) {
+                localDao = dao;
+                if (localDao == null) {
+                    dao = localDao = new DAO();
+                }
+            }
+        }
+        return localDao;
+    }
 }
